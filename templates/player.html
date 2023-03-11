@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Sign Up</h2>
+{% if error %}
+<p style="color: red;">{{ error }}</p>
+{% endif %}
+<form id="audio-form">
+    <label for="audio-url">Audio URL:</label>
+    <input type="text" id="audio-url" name="audio-url" required>
+    <input type="submit" value="Play">
+</form>
+<audio id="audio-player">
+    <source id="audio-source" src="" type="audio/wav">
+</audio>
+<script>
+    // Connect to the websocket when the form is submitted
+    document.getElementById('audio-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var url = document.getElementById('audio-url').value;
+        fetch('/player', {
+            method: 'POST',
+            body: JSON.stringify({ 'url': url }),
+            headers: { 'Content-Type': 'application/json' }
+        }).then(function(response) {
+            if (!response.ok) {
+                throw new Error('Failed to add audio');
+            }
+            // Update audio source URL with /stream endpoint
+            var audioSource = document.getElementById('audio-source');
+            audioSource.setAttribute('src', '/stream');
+            // Play audio
+            var audioPlayer = document.getElementById('audio-player');
+            audioPlayer.load();
+            audioPlayer.play();
+        }).catch(function(error) {
+            console.error(error);
+            alert('Failed to add audio');
+        });
+    });
+</script>
+{% endblock %}

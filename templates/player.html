@@ -1,42 +1,101 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Sign Up</h2>
-{% if error %}
-<p style="color: red;">{{ error }}</p>
-{% endif %}
-<form id="audio-form">
-    <label for="audio-url">Audio URL:</label>
-    <input type="text" id="audio-url" name="audio-url" required>
-    <input type="submit" value="Play">
-</form>
-<audio id="audio-player">
-    <source id="audio-source" src="" type="audio/wav">
-</audio>
-<script>
-    // Connect to the websocket when the form is submitted
-    document.getElementById('audio-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        var url = document.getElementById('audio-url').value;
-        fetch('/player', {
-            method: 'POST',
-            body: JSON.stringify({ 'url': url }),
-            headers: { 'Content-Type': 'application/json' }
-        }).then(function(response) {
-            if (!response.ok) {
-                throw new Error('Failed to add audio');
-            }
-            // Update audio source URL with /stream endpoint
-            var audioSource = document.getElementById('audio-source');
-            audioSource.setAttribute('src', '/stream');
-            // Play audio
-            var audioPlayer = document.getElementById('audio-player');
-            audioPlayer.load();
-            audioPlayer.play();
-        }).catch(function(error) {
-            console.error(error);
-            alert('Failed to add audio');
-        });
-    });
-</script>
+    <h2>Music Player</h2>
+    <div id="player-controls">
+        <button id="play-btn" onclick="playAudio()">Play</button>
+        <button id="pause-btn" onclick="pauseAudio()">Pause</button>
+        <button id="stop-btn" onclick="stopAudio()">Stop</button>
+        <button id="next-btn" onclick="nextSong()">Next</button>
+        <form id="add-song-form" onsubmit="addSong(event)">
+            <label for="audio-url">Add Song:</label>
+            <input type="text" id="audio-url" name="audio-url" required>
+            <input type="submit" value="Add">
+        </form>
+    </div>
+    <audio id="audio-player">
+        <source id="audio-source" src="" type="audio/mp3">
+    </audio>
+    <script>
+        // Connect to the websocket when the form is submitted
+        function addSong(event) {
+            event.preventDefault();
+            var url = document.getElementById('audio-url').value;
+            fetch('/player', {
+                method: 'POST',
+                body: JSON.stringify({ 'url': url }),
+                headers: { 'Content-Type': 'application/json' }
+            }).then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Failed to add audio');
+                }
+            }).catch(function(error) {
+                console.error(error);
+                alert('Failed to add audio');
+            });
+        }
+        
+        function playAudio() {
+            fetch('/player', {
+                method: 'POST',
+                body: JSON.stringify({ 'cmd': 'play' }),
+                headers: { 'Content-Type': 'application/json' }
+            }).then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Failed to skip to next song');
+                }
+            }).catch(function(error) {
+                console.error(error);
+                alert('Failed to skip to next song');
+            });
+
+        }
+        
+        function pauseAudio() {
+            fetch('/player', {
+                method: 'POST',
+                body: JSON.stringify({ 'cmd': 'stop' }),
+                headers: { 'Content-Type': 'application/json' }
+            }).then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Failed to skip to next song');
+                }
+            }).catch(function(error) {
+                console.error(error);
+                alert('Failed to skip to next song');
+            });
+
+        }
+        
+        function stopAudio() {
+            fetch('/player', {
+                method: 'POST',
+                body: JSON.stringify({ 'cmd': 'stop_full' }),
+                headers: { 'Content-Type': 'application/json' }
+            }).then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Failed to skip to next song');
+                }
+            }).catch(function(error) {
+                console.error(error);
+                alert('Failed to skip to next song');
+            });
+
+        }
+        
+        function nextSong() {
+            fetch('/player', {
+                    method: 'POST',
+                    body: JSON.stringify({ 'cmd': 'next' }),
+                    headers: { 'Content-Type': 'application/json' }
+            }).then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Failed to skip to next song');
+                }
+            }).catch(function(error) {
+                console.error(error);
+                alert('Failed to skip to next song');
+            });
+        }
+    </script>
 {% endblock %}

@@ -35,7 +35,7 @@ class PLayer(web.View):
             url = data['url']
             await room.add_song(url)
         elif cmd == 'play':
-            await room.play_next_song()
+            await room.play_song()
         elif cmd == 'stop':
             await room.stop_song()
         elif cmd == 'stop_full':
